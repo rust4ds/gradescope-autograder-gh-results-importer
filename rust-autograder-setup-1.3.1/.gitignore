@@ -1,0 +1,5 @@
+/target
+# Ignore "tests" that mimic an assignment test directory
+/tests 
+.github/workflows/classroom.yml
+/.autograder
