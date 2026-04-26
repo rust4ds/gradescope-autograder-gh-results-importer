@@ -10,6 +10,11 @@ import urllib.request
 GRADESCOPE_SUBMISSION_DIR = "/autograder/submission"
 
 
+def _redact_url(url):
+    """Strip embedded credentials from a URL so it's safe to log."""
+    return re.sub(r"https://[^@]+@", "https://", url)
+
+
 def resolve_student_repo(metadata_path, config):
     """
     Return the path to the student's repo, cloning only when necessary.
@@ -44,7 +49,7 @@ def resolve_student_repo(metadata_path, config):
     # URL-based submission: find and clone the repo
     github_url = _get_github_url(metadata_path)
     clone_dir = config["clone_dir"]
-    print("Cloning {} ...".format(github_url))
+    print("Cloning {} ...".format(_redact_url(github_url)))
     _clone_git_repo(github_url, config["submission_branch"], clone_dir)
     return clone_dir
 
@@ -157,7 +162,13 @@ def _clone_git_repo(repo, branch, directory):
 
     shutil.rmtree(directory, ignore_errors=True)
     subprocess.run(["git", "clone", repo, directory], capture_output=True, check=True)
-    subprocess.run(["git", "checkout", branch], cwd=directory, capture_output=True)
+    result = subprocess.run(
+        ["git", "checkout", branch], cwd=directory, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            "git checkout '{}' failed: {}".format(branch, result.stderr.strip())
+        )
 
 
 def _get_github_url(metadata_path):

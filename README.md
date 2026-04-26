@@ -45,8 +45,8 @@ gradescope/
 
 See [`gradescope/_template/CHECKLIST.md`](gradescope/_template/CHECKLIST.md) for the full step-by-step process. The short version:
 
-1. Copy `gradescope/_template` to `gradescope/hwNN` ()
-2. Update `config.json` with point values, thresholds, and questions (INCLUDE: Personal Access Token set to all repositories, repo_prefix=257647831-ds210b1sp26-classroom)
+1. Copy `gradescope/_template` to `gradescope/hwNN`
+2. Update `config.json` with point values, thresholds, questions, `github_token`, `github_org`, and `repo_prefix` (see Config reference below for required token scopes)
 3. Write private tests in `rust_template/src/qN/tests.rs`; stubs in `mod.rs`
 4. Point `setup.sh`'s pre-warm build at the new template
 5. Run `./make_zip.sh hwNN` to produce `hwNN_autograder.zip`

@@ -3,7 +3,7 @@
   "total_points": 100,
   "submission_branch": "main",
 
-  "rust_template_dir": "/autograder/source/gradescope/hwNN/rust_template",
+  "rust_template_dir": "/autograder/source/rust_template",
   "grading_tmp_dir": "/tmp/grading_hwNN",
   "clone_dir": "/tmp/student_repo_hwNN",
   "metadata_path": "/autograder/submission_metadata.json",

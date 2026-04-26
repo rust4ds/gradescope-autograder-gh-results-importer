@@ -40,7 +40,7 @@ For each question `qN`:
 Point the pre-warm build at the new template so Cargo dependencies are cached:
 
 ```bash
-cargo build --manifest-path /autograder/source/gradescope/hwNN/rust_template/Cargo.toml
+cargo build --manifest-path /autograder/source/rust_template/Cargo.toml
 ```
 
 ## 8. Verify locally

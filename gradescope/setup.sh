@@ -25,6 +25,7 @@ if [ "\$1" = "clone" ]; then
         case "\$arg" in
             https://*github.com*)
                 echo "\$arg" > /tmp/gradescope_repo_url.txt
+                chmod 600 /tmp/gradescope_repo_url.txt
                 ;;
         esac
     done
