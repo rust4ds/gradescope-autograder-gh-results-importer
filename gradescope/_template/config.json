@@ -1,0 +1,62 @@
+{
+  "assignment_name": "hwNN",
+  "total_points": 100,
+  "submission_branch": "main",
+
+  "rust_template_dir": "/autograder/source/gradescope/hwNN/rust_template",
+  "grading_tmp_dir": "/tmp/grading_hwNN",
+  "clone_dir": "/tmp/student_repo_hwNN",
+  "metadata_path": "/autograder/submission_metadata.json",
+  "results_path": "/autograder/results/results.json",
+
+  "commit_count": {
+    "thresholds": [
+      {
+        "name": "commit_count_3",
+        "min_commits": 3,
+        "points": 5,
+        "description": "At least 3 commits"
+      },
+      {
+        "name": "commit_count_8",
+        "min_commits": 8,
+        "points": 5,
+        "description": "At least 8 commits"
+      }
+    ]
+  },
+
+  "branch_count": {
+    "thresholds": [
+      {
+        "name": "branch_count_2",
+        "min_branches": 2,
+        "points": 5,
+        "description": "At least 2 branches (e.g., main + feature branch)"
+      }
+    ]
+  },
+
+  "questions": [
+    {
+      "name": "q1",
+      "display_name": "Question 1 - TODO",
+      "points": 30,
+      "cargo_test_filter": "q1::tests::",
+      "tests": [
+        {
+          "name": "test_TODO_basic",
+          "points": 5,
+          "kind": "io",
+          "description": "TODO: describe what this test checks (shown to student)"
+        },
+        {
+          "name": "test_TODO_edge",
+          "points": 5,
+          "kind": "structural",
+          "description": "TODO: edge case (hidden until after due date)"
+        }
+      ]
+    }
+  ]
+}

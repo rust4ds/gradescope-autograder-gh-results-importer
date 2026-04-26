@@ -5,10 +5,8 @@ from datetime import datetime, timezone
 
 
 def _parse_iso(timestamp_str):
-    """Parse an ISO 8601 timestamp string into a timezone-aware datetime."""
-    # Normalize trailing Z to +00:00 for fromisoformat compatibility
-    normalized = timestamp_str.replace("Z", "+00:00")
-    return datetime.fromisoformat(normalized)
+    # fromisoformat does not accept trailing Z before Python 3.11
+    return datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
 
 
 def load_metadata(metadata_path):
@@ -102,5 +100,5 @@ def describe_penalty(raw_score, final_score, metadata_path):
     on_time_score = get_best_ontime_score(metadata, due_date) or 0.0
     return (
         "Late submission penalty applied: "
-        "on-time score {:.1f} + 0.5 \u00d7 ({:.1f} \u2212 {:.1f}) = {:.1f}"
+        "on-time score {:.1f} + 0.5x ({:.1f} - {:.1f}) = {:.1f}"
     ).format(on_time_score, raw_score, on_time_score, final_score)

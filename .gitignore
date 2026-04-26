@@ -1,0 +1,18 @@
+# Rust build artifacts
+target/
+Cargo.lock
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local testing directories (student repos cloned for development)
+hw5-distance-metrics/
+hw5-distance-metrics-solution/
+
+# macOS
+.DS_Store
+
+# Assignment configs contain GitHub PATs — never commit these
+gradescope/hw*/config.json

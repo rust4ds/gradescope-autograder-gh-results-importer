@@ -6,7 +6,8 @@ def _make_threshold_result(threshold, unit, passed, actual):
     """Build a Gradescope test result for a single commit/branch threshold."""
     points = threshold["points"]
     score = float(points) if passed else 0.0
-    required = threshold["min_{}s".format(unit)] if unit == "commit" else threshold["min_branches"]
+    key = "min_commits" if unit == "commit" else "min_branches"
+    required = threshold[key]
     name = threshold["name"]
 
     if passed:

@@ -30,16 +30,6 @@ def make_question_test_result(question_name, test_config, passed):
     return make_test_result(name, score, max_score, output, visibility)
 
 
-def make_repo_check_result(check_name, passed, actual, required, unit):
-    """Build a Gradescope test result for a commit/branch count check."""
-    score = 0.0  # filled in by caller after iterating thresholds
-    if passed:
-        output = "PASS: {} {} (required: {})".format(actual, unit, required)
-    else:
-        output = "FAIL: {} {} (required: {})".format(actual, unit, required)
-    return make_test_result(check_name, score, 0.0, output, "visible")
-
-
 def build_results(final_score, test_results, output_msg):
     return {
         "score": round(final_score, 2),

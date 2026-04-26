@@ -1,5 +1,5 @@
 [package]
-name = "hw01"
+name = "HW05-distance-metrics"
 version = "0.1.0"
 edition = "2021"
 publish = false

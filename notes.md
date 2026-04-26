@@ -33,3 +33,5 @@ ultimate goal:
     -> pulls data from same bucket with the json, uses that for the autograder
 
 -> also could just do an autograder via gradescope upload github
+
+**rethink this**
