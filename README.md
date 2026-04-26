@@ -45,8 +45,8 @@ gradescope/
 
 See [`gradescope/_template/CHECKLIST.md`](gradescope/_template/CHECKLIST.md) for the full step-by-step process. The short version:
 
-1. Copy `gradescope/_template` to `gradescope/hwNN`
-2. Update `config.json` with point values, thresholds, and questions
+1. Copy `gradescope/_template` to `gradescope/hwNN` ()
+2. Update `config.json` with point values, thresholds, and questions (INCLUDE: Personal Access Token set to all repositories, repo_prefix=257647831-ds210b1sp26-classroom)
 3. Write private tests in `rust_template/src/qN/tests.rs`; stubs in `mod.rs`
 4. Point `setup.sh`'s pre-warm build at the new template
 5. Run `./make_zip.sh hwNN` to produce `hwNN_autograder.zip`
@@ -90,7 +90,7 @@ final = best_ontime_score + 0.5 * (raw_score - best_ontime_score)
 
 ## Custom question graders
 
-To grade a question differently than the default `cargo test` pass/fail:
+To grade a question differently than the default `cargo test` pass/fail (This can be used similarly to the Cargo Demo of prior HW's): 
 
 ```python
 # questions.py
@@ -104,19 +104,3 @@ GRADE_FUNCTIONS = {
 ```
 
 Then set `"function": "grade_my_question"` in the question's config entry. See `grade_run_output` in `questions.py` for a working example (used for output-based grading).
-
-## Local testing
-
-```bash
-cd gradescope
-# In config.json, set rust_template_dir to a local path and
-# metadata_path to a non-existent path to skip lateness calculation.
-python3 grader.py
-```
-
-## Requirements
-
-- Python 3.7+
-- Rust (installed by `setup.sh` via `rustup`)
-- `git` on `PATH`
-- Network access to GitHub
