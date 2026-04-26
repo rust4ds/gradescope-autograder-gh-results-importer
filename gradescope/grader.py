@@ -8,7 +8,7 @@ import questions as questions_module
 import repo_checks
 import results as results_module
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
+CONFIG_PATH = os.environ.get("AUTOGRADER_CONFIG") or os.path.join(os.path.dirname(__file__), "config.json")
 
 
 def read_config(config_path):
