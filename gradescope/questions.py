@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import helpers
@@ -148,6 +149,61 @@ def _make_run_result(display_name, check, passed, detail):
     desc = check.get("description", check["name"])
     output = "PASS: {}".format(desc) if passed else "FAIL: {} ({})".format(desc, detail)
     return results_module.make_test_result(name, score, check["points"], output, "visible")
+
+
+def build_demo_run_summary(config, student_repo_dir, grading_tmp_dir):
+    """
+    Optionally run `cargo run` and return a text block for the Gradescope summary.
+    Controlled by config["demo_run_summary"].
+    """
+    demo_cfg = config.get("demo_run_summary", {})
+    if not demo_cfg.get("enabled", False):
+        return ""
+
+    question_module = demo_cfg.get("question_module")
+    if not question_module:
+        return ""
+
+    title = demo_cfg.get("title", "Cargo run demo output")
+    max_chars = int(demo_cfg.get("max_chars", 4000))
+    timeout_seconds = int(demo_cfg.get("timeout_seconds", 12))
+    run_in_student_repo = demo_cfg.get("run_in_student_repo", True)
+
+    try:
+        run_dir = student_repo_dir
+        if not run_in_student_repo:
+            helpers.setup_grading_dir(config["rust_template_dir"], grading_tmp_dir)
+            helpers.copy_student_module(student_repo_dir, grading_tmp_dir, question_module)
+            run_dir = grading_tmp_dir
+
+        if not os.path.exists(os.path.join(run_dir, "Cargo.toml")):
+            return "{}:\nUnavailable: no Cargo.toml found in {}".format(title, run_dir)
+
+        # Keep demo output best-effort so it cannot stall grading completion.
+        result = subprocess.run(
+            ["cargo", "run"],
+            cwd=run_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=timeout_seconds,
+        )
+        output = result.stdout.strip()
+        if not output:
+            output = "(no stdout)"
+    except FileNotFoundError as e:
+        return "{}:\nUnavailable: {}".format(title, e)
+    except subprocess.TimeoutExpired:
+        return "{}:\nTimed out after {}s (skipped in summary)".format(
+            title, timeout_seconds
+        )
+    except Exception as e:
+        return "{}:\nError while running cargo run: {}".format(title, e)
+
+    if max_chars > 0 and len(output) > max_chars:
+        output = output[:max_chars].rstrip() + "\n... [truncated]"
+
+    return "{}:\n{}".format(title, output)
 
 
 # Add entries here only for questions that need non-standard grading logic.

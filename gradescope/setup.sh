@@ -4,7 +4,9 @@ set -euo pipefail
 apt-get update -y
 apt-get install -y curl build-essential git
 
-# Install Rust (non-interactive)
+# Install Rust (non-interactive) with stable as the bootstrap toolchain.
+# The rust_template's rust-toolchain.toml then pins the exact version + components
+# (rustfmt, clippy), and rustup auto-installs that toolchain on first `cargo` run.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 source "$HOME/.cargo/env"
 

@@ -1,5 +1,9 @@
 {
   "assignment_name": "hwNN",
+  "github_token": "",
+  "github_org": "YOUR_GITHUB_ORG",
+  "github_classroom_id": 0,
+  "repo_prefix": "hwNN-",
   "total_points": 100,
   "submission_branch": "main",
 

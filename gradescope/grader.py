@@ -16,6 +16,34 @@ def read_config(config_path):
         return json.load(f)
 
 
+def _grade_pass(config, clone_dir, grading_tmp_dir):
+    """Run all questions + repo checks once. Returns (score, test_results, summaries)."""
+    questions_module.setup_submission(config, clone_dir, grading_tmp_dir)
+
+    test_results = []
+    score = 0.0
+    summaries = []
+
+    for question in config["questions"]:
+        fn_name = question.get("function", "")
+        grade_fn = questions_module.GRADE_FUNCTIONS.get(fn_name, questions_module.grade_question)
+        s, _max, results, msg = grade_fn(clone_dir, grading_tmp_dir, question)
+        score += s
+        test_results.extend(results)
+        summaries.append(msg)
+        print(msg)
+
+    commit_score, commit_results = repo_checks.grade_commit_count(clone_dir, config)
+    score += commit_score
+    test_results.extend(commit_results)
+
+    branch_score, branch_results = repo_checks.grade_branch_count(clone_dir, config)
+    score += branch_score
+    test_results.extend(branch_results)
+
+    return score, test_results, summaries
+
+
 def main():
     config = read_config(CONFIG_PATH)
 
@@ -29,37 +57,56 @@ def main():
         _write_error(results_path, "Could not access student repo: {}".format(e))
         return
 
-    questions_module.setup_submission(config, clone_dir, grading_tmp_dir)
+    # Grade the current state of the repo (this is what the student sees as their result).
+    print("=== Grading current state ===")
+    current_score, all_test_results, question_summaries = _grade_pass(
+        config, clone_dir, grading_tmp_dir
+    )
+    demo_summary = questions_module.build_demo_run_summary(
+        config, clone_dir, grading_tmp_dir
+    )
 
-    all_test_results = []
-    total_score = 0.0
-    question_summaries = []
+    # If the submission is late and we have full git history, also grade the commit
+    # at the deadline. The student's final score blends ontime + late at LATE_MULTIPLIER.
+    late = lateness.is_late(metadata_path)
+    ontime_score = None
+    ontime_note = ""
+    is_real_clone = clone_dir == config["clone_dir"]  # vs shallow GRADESCOPE_SUBMISSION_DIR
 
-    for question in config["questions"]:
-        fn_name = question.get("function", "")
-        grade_fn = questions_module.GRADE_FUNCTIONS.get(fn_name, questions_module.grade_question)
-
-        score, max_score, test_results, msg = grade_fn(
-            clone_dir, grading_tmp_dir, question
+    if late and is_real_clone:
+        due_date = lateness.get_due_date_from_path(metadata_path)
+        if due_date is not None:
+            ontime_commit = helpers.find_commit_before(clone_dir, due_date)
+            if ontime_commit:
+                original_ref = helpers.current_ref(clone_dir)
+                try:
+                    helpers.checkout(clone_dir, ontime_commit)
+                    print("=== Grading code as of deadline ({}) ===".format(ontime_commit[:8]))
+                    ontime_score, _, _ = _grade_pass(config, clone_dir, grading_tmp_dir)
+                finally:
+                    helpers.checkout(clone_dir, original_ref)
+            else:
+                ontime_score = 0.0
+                ontime_note = "No commits before deadline — on-time score = 0."
+                print(ontime_note)
+    elif late and not is_real_clone:
+        ontime_note = (
+            "Late, but no full git clone available — falling back to current score "
+            "with flat penalty."
         )
-        total_score += score
-        all_test_results.extend(test_results)
-        question_summaries.append(msg)
-        print(msg)
+        print(ontime_note)
 
-    commit_score, commit_results = repo_checks.grade_commit_count(clone_dir, config)
-    total_score += commit_score
-    all_test_results.extend(commit_results)
-
-    branch_score, branch_results = repo_checks.grade_branch_count(clone_dir, config)
-    total_score += branch_score
-    all_test_results.extend(branch_results)
-
-    final_score = lateness.compute_penalty(total_score, metadata_path)
-    penalty_desc = lateness.describe_penalty(total_score, final_score, metadata_path)
+    final_score = lateness.apply_penalty(current_score, ontime_score, late)
+    penalty_desc = lateness.describe(current_score, ontime_score, final_score, late)
     print(penalty_desc)
 
-    summary = "\n".join(question_summaries + [penalty_desc])
+    summary_lines = question_summaries + [penalty_desc]
+    if ontime_note:
+        summary_lines.append(ontime_note)
+    if demo_summary:
+        summary_lines.extend(["", demo_summary])
+    summary = "\n".join(summary_lines)
+
     results_module.write_results(final_score, all_test_results, summary, results_path)
     print("Results written to", results_path)
     print("Final score: {:.2f}".format(final_score))

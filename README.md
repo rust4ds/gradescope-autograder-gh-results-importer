@@ -83,7 +83,7 @@ The token needs **Contents: Read** and **Metadata: Read** on student repos, plus
 Applied when `submission_time > due_date`:
 
 ```
-final = best_ontime_score + 0.5 * (raw_score - best_ontime_score)
+final = best_ontime_score + 0.8 * (raw_score - best_ontime_score)
 ```
 
 `best_ontime_score` is the highest score from any prior on-time submission for that student (0 if none). On-time submissions are returned unchanged. If `submission_metadata.json` is absent (local testing), the raw score is used with a warning.

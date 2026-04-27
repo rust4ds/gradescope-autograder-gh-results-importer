@@ -22,6 +22,11 @@ cp "${HW}/config.json" "$TMP/config.json"
 cp -r "${HW}/rust_template" "$TMP/rust_template"
 rm -rf "$TMP/rust_template/target"
 
+# Optional: bundle a Classroom roster CSV so the autograder can map BU email → GitHub username
+if [ -f "${HW}/roster.csv" ]; then
+    cp "${HW}/roster.csv" "$TMP/roster.csv"
+fi
+
 cd "$TMP"
 zip -r "$OUT" . --exclude "*/__pycache__/*" --exclude "*/Cargo.lock"
 
